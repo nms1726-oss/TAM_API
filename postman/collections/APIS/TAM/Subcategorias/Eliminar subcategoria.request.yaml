@@ -1,0 +1,5 @@
+$kind: http-request
+name: Eliminar subcategoria
+url: http://localhost:3000/subcategories/delete/9
+method: DELETE
+order: 4429964343517830

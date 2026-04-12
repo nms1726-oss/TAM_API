@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener todos los productos
+url: http://localhost:3000/products/all
+method: GET
+order: 1775855520485

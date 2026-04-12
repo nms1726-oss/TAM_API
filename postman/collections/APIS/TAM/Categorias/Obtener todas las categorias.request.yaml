@@ -1,0 +1,12 @@
+$kind: http-request
+name: Obtener todas las categorias
+url: http://localhost:3000/categories/all
+method: GET
+body:
+  type: json
+  content: "    {\r
+
+    \    \"descripcion\": \"celular analogo\"\r
+
+    \    }"
+order: 1775747325416

@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener rol por Id
+url: ""
+method: GET
+order: 3527654919987483

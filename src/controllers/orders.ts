@@ -64,23 +64,42 @@ async function updateOrder(req: Request, res: Response): Promise<Response> {
     const data = req.body as Order;
 
     try {
-        const result = await db.query(
-            `UPDATE pedidos SET 
-            cod_factura = ?, 
-            fecha = ?, 
-            canal_venta = ?, 
-            valor = ?, 
-            usuario_id = ? 
-            WHERE id = ?`,
-            [
-                data.cod_factura,
-                data.fecha,
-                data.canal_venta,
-                data.valor,
-                data.usuario_id,
-                id
-            ]
-        );
+        let fields: string[] = [];
+        let values: any[] = [];
+
+        if (data.cod_factura !== undefined) {
+            fields.push('cod_factura = ?');
+            values.push(data.cod_factura);
+        }
+
+        if (data.fecha !== undefined) {
+            fields.push('fecha = ?');
+            values.push(data.fecha);
+        }
+
+        if (data.canal_venta !== undefined) {
+            fields.push('canal_venta = ?');
+            values.push(data.canal_venta);
+        }
+
+        if (data.valor !== undefined) {
+            fields.push('valor = ?');
+            values.push(data.valor);
+        }
+
+        if (data.usuario_id !== undefined) {
+            fields.push('usuario_id = ?');
+            values.push(data.usuario_id);
+        }
+
+        if (fields.length === 0) {
+            return res.status(400).json({ error: 'No hay campos para actualizar' });
+        }
+
+        const query = `UPDATE pedidos SET ${fields.join(', ')} WHERE id = ?`;
+        values.push(id);
+
+        const result = await db.query(query, values);
 
         if (!result) {
             return res.status(404).json({ error: 'Pedido no encontrado' });

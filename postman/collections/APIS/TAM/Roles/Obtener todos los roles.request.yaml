@@ -1,0 +1,5 @@
+$kind: http-request
+url: ""
+method: GET
+examples: .resources/Obtener todos los roles.resources/examples
+order: 1775747070133

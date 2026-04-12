@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener todos los usuarios
+url: http://localhost:3000/users/all
+method: GET
+order: 1776027694796

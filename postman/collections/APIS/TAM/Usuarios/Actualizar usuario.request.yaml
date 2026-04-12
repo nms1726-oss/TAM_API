@@ -1,0 +1,14 @@
+$kind: http-request
+name: Actualizar usuario
+url: http://localhost:3000/users/update/2
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"email\" : \"carlp20@gmail.com\",\r
+
+    \    \"user_name\" : \"carl_perez20\"\r
+
+    }"
+order: 1216851513702967

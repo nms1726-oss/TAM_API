@@ -1,0 +1,12 @@
+$kind: http-request
+name: Actualizar subcategoria
+url: http://localhost:3000/subcategories/update/9
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"descripcion\" : \"Teclados mecanicos\"\r
+
+    }"
+order: 4394019013699700

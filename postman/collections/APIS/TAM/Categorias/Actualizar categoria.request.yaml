@@ -1,0 +1,12 @@
+$kind: http-request
+name: Actualizar categoria
+url: http://localhost:3000/categories/update/8
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"descripcion\" : \"Celular gama media\"\r
+
+    }"
+order: 4162873668775950

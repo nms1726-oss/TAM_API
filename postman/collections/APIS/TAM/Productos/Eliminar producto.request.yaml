@@ -1,0 +1,5 @@
+$kind: http-request
+name: Eliminar producto
+url: http://localhost:3000/products/delete/10
+method: DELETE
+order: 4103116317160770

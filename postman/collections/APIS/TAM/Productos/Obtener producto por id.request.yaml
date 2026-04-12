@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener producto por id
+url: http://localhost:3000/products/3
+method: GET
+order: 1377888191193023

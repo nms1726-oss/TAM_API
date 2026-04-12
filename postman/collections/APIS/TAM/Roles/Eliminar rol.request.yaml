@@ -1,0 +1,5 @@
+$kind: http-request
+name: Eliminar rol
+url: ""
+method: DELETE
+order: 4349702172310110

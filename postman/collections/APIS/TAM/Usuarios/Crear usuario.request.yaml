@@ -1,0 +1,34 @@
+$kind: http-request
+name: Crear usuario
+url: http://localhost:3000/users/create
+method: POST
+body:
+  type: json
+  content: "    {\r
+
+    \    \"nombre_completo\" : \"Carlos Perez\",\r
+
+    \    \"tipo_documento\" : \"CC\",\r
+
+    \    \"identificacion\" : \"10102929\",\r
+
+    \    \"fecha_nacimiento\" : \"1990-01-01\",\r
+
+    \    \"email\" : \"carlos.perez@gmail.com\",\r
+
+    \    \"password\" : \"123456\",\r
+
+    \    \"verificado\" : 1,\r
+
+    \    \"token_verificacion\" : \"abc123\",\r
+
+    \    \"user_name\" : \"carlos_perez20\",\r
+
+    \    \"foto_perfil\" : null,\r
+
+    \    \"rol_id\" : 2,\r
+
+    \    \"estado\" : 1\r
+
+    \    }"
+order: 851173725916561

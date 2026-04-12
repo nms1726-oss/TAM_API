@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener subcategoria por id
+url: http://localhost:3000/subcategories/5
+method: GET
+order: 4298615167361522

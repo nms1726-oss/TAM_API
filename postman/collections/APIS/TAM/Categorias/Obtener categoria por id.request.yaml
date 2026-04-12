@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener categoria por id
+url: http://localhost:3000/categories/1
+method: GET
+order: 1201942302844668

@@ -1,0 +1,12 @@
+$kind: http-request
+name: Crear categoria
+url: http://localhost:3000/categories/create
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"descripcion\" : \"Camara acuatica\"\r
+
+    }"
+order: 2080058061807862

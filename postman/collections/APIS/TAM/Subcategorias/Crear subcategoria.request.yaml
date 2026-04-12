@@ -1,0 +1,14 @@
+$kind: http-request
+url: http://localhost:3000/subcategories/create
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"descripcion\" : \"Teclados gamer\",\r
+
+    \    \"categoria_id\" : 6\r
+
+    }"
+examples: .resources/Crear subcategoria.resources/examples
+order: 4388847557683035

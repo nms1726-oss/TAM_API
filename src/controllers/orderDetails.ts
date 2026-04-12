@@ -34,22 +34,18 @@ async function getOrderDetailById(req: Request, res: Response): Promise<Response
 async function createOrderDetail(req: Request, res: Response) {
     const data = req.body as OrderDetail;
 
-    if (!data.cantidad || !data.valor_producto || !data.pedido_id || !data.producto_id) {
+    if (!data.cantidad || !data.iva_porcentaje || !data.pedido_id || !data.producto_id) {
         return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
 
     try {
         const result = await db.query(
             `INSERT INTO detalle_pedido 
-            (cantidad, valor_producto, iva_porcentaje, subtotal, iva, total, pedido_id, producto_id) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+            (cantidad, iva_porcentaje, pedido_id, producto_id) 
+            VALUES (?, ?, ?, ?)`,
             [
                 data.cantidad,
-                data.valor_producto,
                 data.iva_porcentaje,
-                data.subtotal,
-                data.iva,
-                data.total,
                 data.pedido_id,
                 data.producto_id
             ]
@@ -67,29 +63,37 @@ async function updateOrderDetail(req: Request, res: Response): Promise<Response>
     const data = req.body as OrderDetail;
 
     try {
-        const result = await db.query(
-            `UPDATE detalle_pedido SET 
-            cantidad = ?, 
-            valor_producto = ?, 
-            iva_porcentaje = ?, 
-            subtotal = ?, 
-            iva = ?, 
-            total = ?, 
-            pedido_id = ?, 
-            producto_id = ? 
-            WHERE id = ?`,
-            [
-                data.cantidad,
-                data.valor_producto,
-                data.iva_porcentaje,
-                data.subtotal,
-                data.iva,
-                data.total,
-                data.pedido_id,
-                data.producto_id,
-                id
-            ]
-        );
+        let fields: string[] = [];
+        let values: any[] = [];
+
+        if (data.cantidad !== undefined) {
+            fields.push('cantidad = ?');
+            values.push(data.cantidad);
+        }
+
+        if (data.iva_porcentaje !== undefined) {
+            fields.push('iva_porcentaje = ?');
+            values.push(data.iva_porcentaje);
+        }
+
+        if (data.pedido_id !== undefined) {
+            fields.push('pedido_id = ?');
+            values.push(data.pedido_id);
+        }
+
+        if (data.producto_id !== undefined) {
+            fields.push('producto_id = ?');
+            values.push(data.producto_id);
+        }
+
+        if (fields.length === 0) {
+            return res.status(400).json({ error: 'No hay campos para actualizar' });
+        }
+
+        const query = `UPDATE detalle_pedido SET ${fields.join(', ')} WHERE id = ?`;
+        values.push(id);
+
+        const result = await db.query(query, values);
 
         if (!result) {
             return res.status(404).json({ error: 'Detalle no encontrado' });

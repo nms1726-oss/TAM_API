@@ -72,27 +72,50 @@ async function updateUser(req: Request, res: Response): Promise<Response> {
     const data = req.body as User;
 
     try {
-        const result = await db.query(
-            `UPDATE usuarios SET 
-            nombre_completo = ?, 
-            email = ?, 
-            user_name = ?, 
-            estado = ? 
-            WHERE id = ?`,
-            [
-                data.nombre_completo,
-                data.email,
-                data.user_name,
-                data.estado,
-                id
-            ]
-        );
+        let campos: string[] = [];
+        let valores: any[] = [];
 
-        if (!result) {
-            return res.status(404).json({ error: 'Usuario no encontrado' });
+        if (data.nombre_completo !== undefined) {
+            campos.push("nombre_completo = ?");
+            valores.push(data.nombre_completo);
         }
 
-        return res.json({ id, ...data });
+        if (data.email !== undefined) {
+            campos.push("email = ?");
+            valores.push(data.email);
+        }
+
+        if (data.password !== undefined) {
+            campos.push("password = ?");
+            valores.push(data.password);
+        }
+
+        if (data.user_name !== undefined) {
+            campos.push("user_name = ?");
+            valores.push(data.user_name);
+        }
+
+        if (data.estado !== undefined) {
+            campos.push("estado = ?");
+            valores.push(data.estado);
+        }
+
+        if (campos.length === 0) {
+            return res.status(400).json({ error: "No hay campos para actualizar" });
+        }
+
+        valores.push(id);
+
+        const query = `
+            UPDATE usuarios 
+            SET ${campos.join(", ")} 
+            WHERE id = ?
+        `;
+
+        const result = await db.query(query, valores);
+
+        return res.json({ message: "Usuario actualizado correctamente" });
+
     } catch (error) {
         console.error('Error actualizando el usuario:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

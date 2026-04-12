@@ -1,0 +1,30 @@
+$kind: http-request
+name: Crear producto
+url: http://localhost:3000/products/create
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"nombre\": \"Cámara Insta450 sl\",\r
+
+    \    \"precio\": \"1679726.00\",\r
+
+    \    \"marca\": null,\r
+
+    \    \"caracteristicas_basicas\": \"Cámara de acción 360°, resistente al
+    agua, compacta.\",\r
+
+    \    \"caracteristicas_tecnicas\": \"Grabación 8K, estabilización FlowState,
+    batería 1800mAh, conectividad WiFi/Bluetooth.\",\r
+
+    \    \"imagen\": \"assets/img/insta360_acepro2.jpg\",\r
+
+    \    \"stock\": 20,\r
+
+    \    \"costo\": \"1400000.00\",\r
+
+    \    \"subcategoria_id\": 3\r
+
+    }"
+order: 3619737244351843

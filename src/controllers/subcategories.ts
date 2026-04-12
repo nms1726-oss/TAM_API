@@ -57,8 +57,8 @@ async function updateSubcategory(req: Request, res: Response): Promise<Response>
 
     try {
         const result = await db.query(
-            'UPDATE subcategorias SET descripcion = ?, categoria_id = ? WHERE id = ?',
-            [data.descripcion, data.categoria_id, id]
+            'UPDATE subcategorias SET descripcion = ? WHERE id = ?',
+            [data.descripcion, id]
         );
 
         if (!result) {

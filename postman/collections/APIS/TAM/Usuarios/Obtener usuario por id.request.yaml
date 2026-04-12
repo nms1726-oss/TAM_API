@@ -1,0 +1,5 @@
+$kind: http-request
+name: Obtener usuario por id
+url: http://localhost:3000/users/1
+method: GET
+order: 557103486164796

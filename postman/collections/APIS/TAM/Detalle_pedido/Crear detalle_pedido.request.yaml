@@ -1,0 +1,18 @@
+$kind: http-request
+name: Crear detalle_pedido
+url: http://localhost:3000/orderDetails/create
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"cantidad\" : 3,\r
+
+    \    \"iva_porcentaje\" : 19,\r
+
+    \    \"pedido_id\" : 1,\r
+
+    \    \"producto_id\" : 8\r
+
+    }"
+order: 1776031788295

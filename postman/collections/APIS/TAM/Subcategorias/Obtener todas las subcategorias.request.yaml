@@ -1,0 +1,12 @@
+$kind: http-request
+name: Obtener todas las subcategorias
+url: http://localhost:3000/subcategories/all
+method: GET
+body:
+  type: json
+  content: "    {\r
+
+    \    \"descripcion\": \"celular analogo\"\r
+
+    \    }"
+order: 1118968231231087

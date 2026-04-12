@@ -1,0 +1,5 @@
+$kind: http-request
+name: Actualizar rol
+url: ""
+method: PUT
+order: 4276688728207252

@@ -1,0 +1,18 @@
+$kind: http-request
+name: Actualizar producto
+url: http://localhost:3000/products/update/10
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"stock\": 30,\r
+
+    \    \"precio\": \"1879726.00\",\r
+
+    \    \"caracteristicas_basicas\": \"Cámara de acción 360°\",\r
+
+    \    \"caracteristicas_tecnicas\": \"Grabación 8K-4K\"\r
+
+    }"
+order: 4056981982991348
