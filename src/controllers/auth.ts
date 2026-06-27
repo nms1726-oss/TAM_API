@@ -11,16 +11,16 @@ const JWT_SECRET = 'secret_key';
 async function login(req: Request, res: Response): Promise<Response> {
     const data = req.body as Auth;
 
-    if (!data.email || !data.password) {
+    if (!data.user_name || !data.password) {
         return res.status(400).json({
-            error: 'Email y contraseña son obligatorios'
+            error: 'Usuario y contraseña son obligatorios'
         });
     }
 
     try {
         const result = await db.query(
-            'SELECT * FROM usuarios WHERE email = ?',
-            [data.email]
+            'SELECT * FROM usuarios WHERE user_name = ?',
+            [data.user_name]
         );
 
         const user: User | undefined =
@@ -55,6 +55,7 @@ async function login(req: Request, res: Response): Promise<Response> {
             {
                 id: (user as any).id,
                 email: user.email,
+                user_name: user.user_name,
                 rol_id: user.rol_id
             },
             JWT_SECRET,
@@ -162,7 +163,75 @@ async function register(req: Request, res: Response): Promise<Response> {
     }
 }
 
+async function changePassword(
+    req: Request,
+    res: Response
+): Promise<Response> {
+
+    const id = parseInt(req.params.id as string);
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+        return res.status(400).json({
+            error: 'La contraseña actual y la nueva contraseña son obligatorias'
+        });
+    }
+
+    try {
+
+        const result = await db.query(
+            'SELECT password FROM usuarios WHERE id = ?',
+            [id]
+        );
+
+        const user =
+            Array.isArray(result) && result.length > 0
+                ? result[0] as User
+                : undefined;
+
+        if (!user) {
+            return res.status(404).json({
+                error: 'Usuario no encontrado'
+            });
+        }
+
+        const validPassword = await bcrypt.compare(
+            currentPassword,
+            user.password
+        );
+
+        if (!validPassword) {
+            return res.status(401).json({
+                error: 'La contraseña actual es incorrecta'
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(
+            newPassword,
+            10
+        );
+
+        await db.query(
+            'UPDATE usuarios SET password = ? WHERE id = ?',
+            [hashedPassword, id]
+        );
+
+        return res.status(200).json({
+            message: 'Contraseña actualizada correctamente'
+        });
+
+    } catch (error) {
+
+        console.error('Error cambiando contraseña:', error);
+
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
+    }
+}
+
 export default {
     login,
-    register
+    register,
+    changePassword
 };

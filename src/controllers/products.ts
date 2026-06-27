@@ -61,7 +61,9 @@ async function createProduct(req: Request, res: Response) {
                 data.precio,
                 data.marca,
                 data.descripcion,
-                JSON.stringify(data.caracteristicas_tecnicas),
+                typeof data.caracteristicas_tecnicas === 'string'
+                    ? data.caracteristicas_tecnicas
+                    : JSON.stringify(data.caracteristicas_tecnicas),
                 data.imagen,
                 data.stock,
                 data.costo,
@@ -107,7 +109,11 @@ async function updateProduct(req: Request, res: Response): Promise<Response> {
 
         if (data.caracteristicas_tecnicas !== undefined) {
             fields.push('caracteristicas_tecnicas = ?');
-            values.push(JSON.stringify(data.caracteristicas_tecnicas));
+            values.push(
+            typeof data.caracteristicas_tecnicas === 'string'
+                ? data.caracteristicas_tecnicas
+                : JSON.stringify(data.caracteristicas_tecnicas)
+            );
         }
 
         if (data.imagen !== undefined) {

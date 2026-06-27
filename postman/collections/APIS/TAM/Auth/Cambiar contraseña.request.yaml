@@ -1,0 +1,14 @@
+$kind: http-request
+name: Cambiar contraseña
+url: http://localhost:3000/auth/change-password/29
+method: PUT
+body:
+  type: json
+  content: "{\r
+
+    \    \"currentPassword\" : \"Juan.2006\",\r
+
+    \    \"newPassword\" : \"Juan.2026\"\r
+
+    }"
+order: 1782586214947

@@ -3,7 +3,7 @@ export interface Product {
     precio: number;
     marca?: string;
     descripcion: string;
-    caracteristicas_tecnicas: object;
+    caracteristicas_tecnicas: object | string;
     imagen?: string;
     stock: number;
     costo: number;
