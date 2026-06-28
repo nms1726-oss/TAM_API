@@ -39,7 +39,7 @@ async function createOrderDetail(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             `INSERT INTO detalle_pedido 
             (cantidad, iva_porcentaje, pedido_id, producto_id) 
             VALUES (?, ?, ?, ?)`,
@@ -51,7 +51,7 @@ async function createOrderDetail(req: Request, res: Response) {
             ]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando detalle:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

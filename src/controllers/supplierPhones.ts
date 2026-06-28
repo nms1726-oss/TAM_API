@@ -39,12 +39,12 @@ async function createSupplierPhone(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             'INSERT INTO telefono_proveedores (proveedor_id, telefono) VALUES (?, ?)',
             [data.proveedor_id, data.telefono]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando teléfono:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

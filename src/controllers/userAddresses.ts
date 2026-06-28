@@ -39,7 +39,7 @@ async function createUserAddress(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+       const result: any = await db.query(
             `INSERT INTO direccion_usuarios
             (usuario_id, direccion, barrio, ciudad, departamento, pais)
             VALUES (?, ?, ?, ?, ?, ?)`,
@@ -53,7 +53,7 @@ async function createUserAddress(req: Request, res: Response) {
             ]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando dirección:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

@@ -52,7 +52,7 @@ async function createProduct(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             `INSERT INTO productos
             (nombre, precio, marca, descripcion, caracteristicas_tecnicas, imagen, stock, costo, subcategoria_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -71,7 +71,7 @@ async function createProduct(req: Request, res: Response) {
             ]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
 
     } catch (error) {
         console.error('Error creando el producto:', error);

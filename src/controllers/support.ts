@@ -38,7 +38,7 @@ async function createSupport(req: Request, res: Response): Promise<Response | vo
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             'INSERT INTO soporte (usuario_id, tipo, descripcion, estado) VALUES (?, ?, ?, ?)',
             [
                 data.usuario_id, 
@@ -47,7 +47,7 @@ async function createSupport(req: Request, res: Response): Promise<Response | vo
                 data.estado
             ]
         );
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando soporte:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

@@ -40,7 +40,7 @@ async function createUser(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             `INSERT INTO usuarios 
             (nombre_completo, tipo_documento, identificacion, fecha_nacimiento, email, password, verificado, token_verificacion, user_name, foto_perfil, rol_id, estado, fecha_ultimo_intento) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -60,8 +60,7 @@ async function createUser(req: Request, res: Response) {
                 data.fecha_ultimo_intento
             ]
         );
-
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando el usuario:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

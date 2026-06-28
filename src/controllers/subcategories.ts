@@ -39,12 +39,12 @@ async function createSubcategory(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             'INSERT INTO subcategorias (descripcion, categoria_id) VALUES (?, ?)',
             [data.descripcion, data.categoria_id]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando subcategoría:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

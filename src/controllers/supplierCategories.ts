@@ -44,12 +44,12 @@ async function createSupplierCategory(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             'INSERT INTO proveedores_categorias (proveedor_id, categoria_id) VALUES (?, ?)',
             [data.proveedor_id, data.categoria_id]
         );
 
-        return res.status(201).json({ ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando relación:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

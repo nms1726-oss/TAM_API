@@ -39,7 +39,7 @@ async function createComparisonHistory(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             `INSERT INTO historial_comparaciones
             (fecha, detalle_comparacion, producto_id_1, producto_id_2, producto_id_3, usuario_id)
             VALUES (?, ?, ?, ?, ?, ?)`,
@@ -52,7 +52,7 @@ async function createComparisonHistory(req: Request, res: Response) {
             ]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando historial:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

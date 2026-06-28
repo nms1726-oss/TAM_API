@@ -39,14 +39,14 @@ async function createphoneUser(req: Request, res: Response): Promise<Response | 
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             'INSERT INTO telefono_usuarios (usuario_id, telefono) VALUES (?, ?)',
             [
                 data.usuario_id,
                 data.telefono
             ]
         );
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando usuario de teléfono:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });
@@ -59,7 +59,7 @@ async function updatephoneUser(req: Request, res: Response): Promise<Response> {
 
     try {
         const result = await db.query(
-            'UPDATE telefono_usuarios SET usuario_id = ?, telefono = ? WHERE id = ?',
+            'UPDATE telefono_usuarios SET usuario_id = ?, telefono = ? WHERE usuario_id = ?',
             [data.usuario_id, data.telefono, id]
         );
 

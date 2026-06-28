@@ -39,7 +39,7 @@ async function createUserPaymentMethod(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             `INSERT INTO metodo_pago_usuarios
             (usuario_id, tipo, numero_parcial, titular, fecha_expiracion)
             VALUES (?, ?, ?, ?, ?)`,
@@ -52,7 +52,7 @@ async function createUserPaymentMethod(req: Request, res: Response) {
             ]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando método de pago:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

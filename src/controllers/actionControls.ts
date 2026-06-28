@@ -39,12 +39,12 @@ async function createActionControl(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             'INSERT INTO control_acciones (usuario_id, accion, observaciones) VALUES (?, ?, ?)',
             [data.usuario_id, data.accion, data.observaciones]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando acción:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });
