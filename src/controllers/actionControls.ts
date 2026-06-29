@@ -5,29 +5,64 @@ import { ActionControl } from '../models/actionControl.model';
 
 async function getAllActionControls(_req: Request, res: Response): Promise<Response | void> {
     try {
-        const result = await db.query('SELECT * FROM control_acciones', []);
+
+        const result = await db.query(
+            `SELECT
+                ca.*,
+                u.nombre_completo,
+                u.identificacion
+            FROM control_acciones ca
+            INNER JOIN usuarios u
+                ON ca.usuario_id = u.id`,
+            []
+        );
+
         return res.json(emptyOrRows(result));
+
     } catch (error) {
         console.error('Error obteniendo acciones:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
     }
 }
 
 async function getActionControlById(req: Request, res: Response): Promise<Response | void> {
+
     const id = parseInt(req.params.id as string);
 
     try {
-        const result = await db.query('SELECT * FROM control_acciones WHERE id = ?', [id]);
-        const actionControl = Array.isArray(result) && result.length > 0 ? result[0] : undefined;
+
+        const result = await db.query(
+            `SELECT
+                ca.*,
+                u.nombre_completo,
+                u.identificacion
+            FROM control_acciones ca
+            INNER JOIN usuarios u
+                ON ca.usuario_id = u.id
+            WHERE ca.id = ?`,
+            [id]
+        );
+
+        const actionControl =
+            Array.isArray(result) && result.length > 0
+                ? result[0]
+                : undefined;
 
         if (!actionControl) {
-            return res.status(404).json({ error: 'Acción no encontrada' });
+            return res.status(404).json({
+                error: 'Acción no encontrada'
+            });
         }
 
         return res.json(actionControl);
+
     } catch (error) {
         console.error('Error obteniendo acción:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
     }
 }
 

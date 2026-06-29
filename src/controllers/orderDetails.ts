@@ -4,30 +4,64 @@ import { Request, Response } from 'express';
 import { OrderDetail } from '../models/orderDetail.model';
 
 async function getAllOrderDetails(_req: Request, res: Response): Promise<Response | void> {
+
     try {
-        const result = await db.query('SELECT * FROM detalle_pedido', []);
+
+        const result = await db.query(
+            `SELECT
+                dp.*,
+                p.nombre
+            FROM detalle_pedido dp
+            INNER JOIN productos p
+                ON dp.producto_id = p.id`,
+            []
+        );
+
         return res.json(emptyOrRows(result));
+
     } catch (error) {
         console.error('Error obteniendo detalles:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
     }
 }
 
 async function getOrderDetailById(req: Request, res: Response): Promise<Response | void> {
+
     const id = parseInt(req.params.id as string);
 
     try {
-        const result = await db.query('SELECT * FROM detalle_pedido WHERE id = ?', [id]);
-        const detail = Array.isArray(result) && result.length > 0 ? result[0] : undefined;
+
+        const result = await db.query(
+            `SELECT
+                dp.*,
+                p.nombre
+            FROM detalle_pedido dp
+            INNER JOIN productos p
+                ON dp.producto_id = p.id
+            WHERE dp.id = ?`,
+            [id]
+        );
+
+        const detail =
+            Array.isArray(result) && result.length > 0
+                ? result[0]
+                : undefined;
 
         if (!detail) {
-            return res.status(404).json({ error: 'Detalle no encontrado' });
+            return res.status(404).json({
+                error: 'Detalle no encontrado'
+            });
         }
 
         return res.json(detail);
+
     } catch (error) {
         console.error('Error obteniendo detalle:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
     }
 }
 

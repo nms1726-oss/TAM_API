@@ -60,21 +60,46 @@ async function createCartDetail(req: Request, res: Response) {
 
 async function updateCartDetail(req: Request, res: Response): Promise<Response> {
     const id = parseInt(req.params.id as string);
-    const { carrito_id, producto_id, cantidad, subtotal } = req.body as CartDetail;
+    const data = req.body as CartDetail;
 
     try {
-        const result = await db.query(
-            `UPDATE detalle_carrito 
-             SET carrito_id = ?, producto_id = ?, cantidad = ?, subtotal = ? 
-             WHERE id = ?`,
-            [carrito_id, producto_id, cantidad, subtotal, id]
-        );
+        let fields: string[] = [];
+        let values: any[] = [];
+
+        if (data.carrito_id !== undefined) {
+            fields.push('carrito_id = ?');
+            values.push(data.carrito_id);
+        }
+
+        if (data.producto_id !== undefined) {
+            fields.push('producto_id = ?');
+            values.push(data.producto_id);
+        }
+
+        if (data.cantidad !== undefined) {
+            fields.push('cantidad = ?');
+            values.push(data.cantidad);
+        }
+
+        if (data.subtotal !== undefined) {
+            fields.push('subtotal = ?');
+            values.push(data.subtotal);
+        }
+
+        if (fields.length === 0) {
+            return res.status(400).json({ error: 'No hay campos para actualizar' });
+        }
+
+        const query = `UPDATE detalle_carrito SET ${fields.join(', ')} WHERE id = ?`;
+        values.push(id);
+
+        const result = await db.query(query, values);
 
         if (!result) {
             return res.status(404).json({ error: 'Detalle del carrito no encontrado' });
         }
 
-        return res.json({ id, carrito_id, producto_id, cantidad, subtotal });
+        return res.json({ id, ...data });
     } catch (error) {
         console.error('Error actualizando detalle del carrito:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

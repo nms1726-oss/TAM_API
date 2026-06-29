@@ -14,4 +14,5 @@ export interface User {
     fecha_ultimo_intento?: Date;
     created_at: Date;
     updated_at: Date;
+    telefono?: string; // Campo opcional para el teléfono
 }

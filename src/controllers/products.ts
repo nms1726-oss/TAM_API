@@ -1,6 +1,7 @@
 import db from '../database/db';
 import { emptyOrRows } from '../config/helper';
 import { Request, Response } from 'express';
+import path from 'path';
 
 import { Product } from '../models/product.model';
 
@@ -36,6 +37,13 @@ async function getProductById(req: Request, res: Response): Promise<Response | v
 
 async function createProduct(req: Request, res: Response) {
     const data = req.body as Product;
+    if (req.file) {
+        data.imagen = path.posix.join(
+            'assets',
+            'img',
+            req.file.filename
+        );
+    }
 
     if (
         !data.nombre ||
@@ -82,6 +90,13 @@ async function createProduct(req: Request, res: Response) {
 async function updateProduct(req: Request, res: Response): Promise<Response> {
     const id = parseInt(req.params.id as string);
     const data = req.body as Product;
+    if (req.file) {
+        data.imagen = path.posix.join(
+            'assets',
+            'img',
+            req.file.filename
+        );
+    }
 
     try {
         let fields: string[] = [];

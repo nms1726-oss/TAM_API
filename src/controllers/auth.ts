@@ -72,7 +72,8 @@ async function login(req: Request, res: Response): Promise<Response> {
                 nombre_completo: user.nombre_completo,
                 email: user.email,
                 user_name: user.user_name,
-                rol_id: user.rol_id
+                rol_id: user.rol_id,
+                foto_perfil: user.foto_perfil
             }
         });
 
@@ -162,6 +163,7 @@ async function register(req: Request, res: Response): Promise<Response> {
         });
     }
 }
+
 
 async function changePassword(
     req: Request,

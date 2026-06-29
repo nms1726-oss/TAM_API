@@ -4,30 +4,77 @@ import { Request, Response } from 'express';
 import { Support } from '../models/support.models';
 
 async function getAllSupport(_req: Request, res: Response): Promise<Response | void> {
+
     try {
-        const result = await db.query('SELECT * FROM soporte', []);
+
+        const result = await db.query(
+            `SELECT
+                s.*,
+                u.user_name,
+                u.identificacion,
+                u.email
+            FROM soporte s
+            INNER JOIN usuarios u
+                ON s.usuario_id = u.id`,
+            []
+        );
+
         return res.json(emptyOrRows(result));
+
     } catch (error) {
+
         console.error('Error obteniendo soporte:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
+
     }
+
 }
 
 async function getSupportById(req: Request, res: Response): Promise<Response | void> {
+
     const id = parseInt(req.params.id as string);
+
     try {
-        const result = await db.query('SELECT * FROM soporte WHERE id = ?', [id]);
-        const support = Array.isArray(result) && result.length > 0 ? result[0] : undefined;
+
+        const result = await db.query(
+            `SELECT
+                s.*,
+                u.user_name,
+                u.identificacion,
+                u.email
+            FROM soporte s
+            INNER JOIN usuarios u
+                ON s.usuario_id = u.id
+            WHERE s.id = ?`,
+            [id]
+        );
+
+        const support =
+            Array.isArray(result) && result.length > 0
+                ? result[0]
+                : undefined;
 
         if (!support) {
-            return res.status(404).json({ error: 'Soporte no encontrado' });
+            return res.status(404).json({
+                error: 'Soporte no encontrado'
+            });
         }
 
         return res.json(support);
+
     } catch (error) {
+
         console.error('Error obteniendo soporte:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
+
     }
+
 }
 
 async function createSupport(req: Request, res: Response): Promise<Response | void> {
