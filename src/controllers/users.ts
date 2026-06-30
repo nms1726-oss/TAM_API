@@ -40,10 +40,10 @@ async function createUser(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
-            `INSERT INTO usuarios 
-            (nombre_completo, tipo_documento, identificacion, fecha_nacimiento, email, password, verificado, token_verificacion, user_name, foto_perfil, rol_id, estado) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        const result: any = await db.query(
+            `INSERT INTO usuarios
+            (nombre_completo, tipo_documento, identificacion, fecha_nacimiento, email, password, verificado, token_verificacion, user_name, foto_perfil, rol_id, estado, fecha_ultimo_intento)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
             [
                 data.nombre_completo,
                 data.tipo_documento,
@@ -51,16 +51,33 @@ async function createUser(req: Request, res: Response) {
                 data.fecha_nacimiento,
                 data.email,
                 data.password,
-                data.verificado,
-                data.token_verificacion,
+                data.verificado ?? 1,
+                data.token_verificacion ?? null,
                 data.user_name,
-                data.foto_perfil,
+                data.foto_perfil ?? null,
                 data.rol_id,
-                data.estado
+                data.estado ?? 1,
+                data.fecha_ultimo_intento ?? null
             ]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        // Guardar teléfono
+        if (data.telefono) {
+            await db.query(
+                `INSERT INTO telefono_usuarios (usuario_id, telefono)
+                 VALUES (?, ?)`,
+                [
+                    result.insertId,
+                    data.telefono
+                ]
+            );
+        }
+
+        return res.status(201).json({
+            id: result.insertId,
+            ...data
+        });
+
     } catch (error) {
         console.error('Error creando el usuario:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });
@@ -80,6 +97,21 @@ async function updateUser(req: Request, res: Response): Promise<Response> {
             valores.push(data.nombre_completo);
         }
 
+        if (data.tipo_documento !== undefined) {
+            campos.push("tipo_documento = ?");
+            valores.push(data.tipo_documento);
+        }
+
+        if (data.identificacion !== undefined) {
+            campos.push("identificacion = ?");
+            valores.push(data.identificacion);
+        }
+
+        if (data.fecha_nacimiento !== undefined) {
+            campos.push("fecha_nacimiento = ?");
+            valores.push(data.fecha_nacimiento);
+        }
+
         if (data.email !== undefined) {
             campos.push("email = ?");
             valores.push(data.email);
@@ -95,30 +127,59 @@ async function updateUser(req: Request, res: Response): Promise<Response> {
             valores.push(data.user_name);
         }
 
+        // ESTE FALTABA
+        if (data.rol_id !== undefined) {
+            campos.push("rol_id = ?");
+            valores.push(data.rol_id);
+        }
+
         if (data.estado !== undefined) {
             campos.push("estado = ?");
             valores.push(data.estado);
         }
 
+        if (data.fecha_ultimo_intento !== undefined) {
+            campos.push("fecha_ultimo_intento = ?");
+            valores.push(data.fecha_ultimo_intento);
+        }
+
         if (campos.length === 0) {
-            return res.status(400).json({ error: "No hay campos para actualizar" });
+            return res.status(400).json({
+                error: "No hay campos para actualizar"
+            });
         }
 
         valores.push(id);
 
         const query = `
-            UPDATE usuarios 
-            SET ${campos.join(", ")} 
+            UPDATE usuarios
+            SET ${campos.join(", ")}
             WHERE id = ?
         `;
 
-        const result = await db.query(query, valores);
+        await db.query(query, valores);
 
-        return res.json({ message: "Usuario actualizado correctamente" });
+        if (data.telefono !== undefined) {
+            await db.query(
+                `UPDATE telefono_usuarios
+                 SET telefono = ?
+                 WHERE usuario_id = ?`,
+                [
+                    data.telefono,
+                    id
+                ]
+            );
+        }
+
+        return res.json({
+            message: "Usuario actualizado correctamente"
+        });
 
     } catch (error) {
         console.error('Error actualizando el usuario:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
     }
 }
 
@@ -139,10 +200,53 @@ async function deleteUser(req: Request, res: Response): Promise<Response> {
     }
 }
 
+async function checkUsername(req: Request, res: Response): Promise<Response> {
+    const { user_name } = req.query;
+
+    if (!user_name) {
+        return res.status(400).json({ error: 'El parámetro user_name es obligatorio' });
+    }
+
+    try {
+        const result = await db.query('SELECT id FROM usuarios WHERE user_name = ?', [user_name]);
+        const existe = Array.isArray(result) && result.length > 0;
+
+        return res.json({ disponible: !existe });
+    } catch (error) {
+        console.error('Error verificando username:', error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}
+
+async function uploadProfilePhoto(req: Request, res: Response): Promise<Response> {
+    const id = parseInt(req.params.id as string);
+    const file = (req as any).file;
+
+    if (!file) {
+        return res.status(400).json({ error: 'No se recibió ningún archivo' });
+    }
+
+    try {
+        const rutaRelativa = `uploads/perfiles/${file.filename}`;
+
+        await db.query(
+            'UPDATE usuarios SET foto_perfil = ? WHERE id = ?',
+            [rutaRelativa, id]
+        );
+
+        return res.json({ message: 'Foto actualizada correctamente', foto_perfil: rutaRelativa });
+    } catch (error) {
+        console.error('Error subiendo foto de perfil:', error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+}
+
 export default {
     getAllUsers,
     getUserById,
     createUser,
     updateUser,
     deleteUser,
+    checkUsername,
+    uploadProfilePhoto
 };

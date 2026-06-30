@@ -39,13 +39,13 @@ async function createRole(req: Request, res: Response) {
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             'INSERT INTO roles (nombre) VALUES (?)',
             [
                 data.nombre
             ]);
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando el rol:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

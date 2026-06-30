@@ -1,0 +1,34 @@
+$kind: http-request
+name: Registrar usuario
+url: http://localhost:3000/auth/register
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"nombre_completo\": \"Juan Pérez\",\r
+
+    \    \"tipo_documento\": \"CC\",\r
+
+    \    \"identificacion\": \"1234567890\",\r
+
+    \    \"fecha_nacimiento\": \"2000-05-10\",\r
+
+    \    \"email\": \"juan@test.com\",\r
+
+    \    \"password\": \"123456\",\r
+
+    \    \"verificado\": 1,\r
+
+    \    \"token_verificacion\": null,\r
+
+    \    \"user_name\": \"juanperez\",\r
+
+    \    \"foto_perfil\": null,\r
+
+    \    \"rol_id\": 1,\r
+
+    \    \"estado\": 1\r
+
+    }"
+order: 478851650691858

@@ -5,8 +5,19 @@ import { Order } from '../models/order.model';
 
 async function getAllOrders(_req: Request, res: Response): Promise<Response | void> {
     try {
-        const result = await db.query('SELECT * FROM pedidos', []);
+        const result = await db.query(
+            `SELECT
+                p.*,
+                u.nombre_completo,
+                u.identificacion
+            FROM pedidos p
+            INNER JOIN usuarios u
+                ON p.usuario_id = u.id`,
+            []
+        );
+
         return res.json(emptyOrRows(result));
+
     } catch (error) {
         console.error('Error obteniendo pedidos:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });
@@ -14,45 +25,66 @@ async function getAllOrders(_req: Request, res: Response): Promise<Response | vo
 }
 
 async function getOrderById(req: Request, res: Response): Promise<Response | void> {
+
     const id = parseInt(req.params.id as string);
 
     try {
-        const result = await db.query('SELECT * FROM pedidos WHERE id = ?', [id]);
-        const order = Array.isArray(result) && result.length > 0 ? result[0] : undefined;
+
+        const result = await db.query(
+            `SELECT
+                p.*,
+                u.nombre_completo,
+                u.identificacion
+            FROM pedidos p
+            INNER JOIN usuarios u
+                ON p.usuario_id = u.id
+            WHERE p.id = ?`,
+            [id]
+        );
+
+        const order =
+            Array.isArray(result) && result.length > 0
+                ? result[0]
+                : undefined;
 
         if (!order) {
-            return res.status(404).json({ error: 'Pedido no encontrado' });
+            return res.status(404).json({
+                error: 'Pedido no encontrado'
+            });
         }
 
         return res.json(order);
+
     } catch (error) {
         console.error('Error obteniendo pedido:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
     }
 }
 
 async function createOrder(req: Request, res: Response) {
     const data = req.body as Order;
 
-    if (!data.cod_factura || !data.fecha || !data.valor || !data.usuario_id) {
+    if (!data.cod_factura || !data.valor || !data.usuario_id) {
         return res.status(400).json({ error: 'Faltan campos obligatorios' });
     }
 
     try {
-        const result = await db.query(
+        const result: any = await db.query(
             `INSERT INTO pedidos 
-            (cod_factura, fecha, canal_venta, valor, usuario_id) 
+            (cod_factura, canal_venta, valor, estado, usuario_id) 
             VALUES (?, ?, ?, ?, ?)`,
             [
                 data.cod_factura,
-                data.fecha,
                 data.canal_venta,
                 data.valor,
+                data.estado || 'pendiente',
                 data.usuario_id
             ]
         );
 
-        return res.status(201).json({ id: result, ...data });
+        return res.status(201).json({ id: result.insertId, ...data });
     } catch (error) {
         console.error('Error creando pedido:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });
@@ -72,11 +104,6 @@ async function updateOrder(req: Request, res: Response): Promise<Response> {
             values.push(data.cod_factura);
         }
 
-        if (data.fecha !== undefined) {
-            fields.push('fecha = ?');
-            values.push(data.fecha);
-        }
-
         if (data.canal_venta !== undefined) {
             fields.push('canal_venta = ?');
             values.push(data.canal_venta);
@@ -85,6 +112,11 @@ async function updateOrder(req: Request, res: Response): Promise<Response> {
         if (data.valor !== undefined) {
             fields.push('valor = ?');
             values.push(data.valor);
+        }
+
+        if (data.estado !== undefined) {
+            fields.push('estado = ?');
+            values.push(data.estado);
         }
 
         if (data.usuario_id !== undefined) {
