@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 
 import { Auth } from '../models/auth.model';
 import { User } from '../models/user.model';
+import { enviarCorreoVerificacion } from '../config/mailer';
 
 const JWT_SECRET = 'secret_key';
 
@@ -164,7 +165,6 @@ async function register(req: Request, res: Response): Promise<Response> {
     }
 }
 
-
 async function changePassword(
     req: Request,
     res: Response
@@ -232,8 +232,108 @@ async function changePassword(
     }
 }
 
+async function enviarCodigoVerificacion(req: Request, res: Response): Promise<Response> {
+    const { user_id } = req.body;
+
+    if (!user_id) {
+        return res.status(400).json({ success: false, message: 'user_id es obligatorio' });
+    }
+
+    try {
+        const result = await db.query('SELECT * FROM usuarios WHERE id = ?', [user_id]);
+        const user: User | undefined =
+            Array.isArray(result) && result.length > 0 ? result[0] as User : undefined;
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        }
+
+        if (user.verificado) {
+            return res.status(400).json({ success: false, message: 'La cuenta ya está verificada' });
+        }
+
+        const codigo = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiracion = new Date(Date.now() + 3 * 60 * 1000); // 3 minutos
+
+        await db.query(
+            'UPDATE usuarios SET token_verificacion = ?, fecha_ultimo_intento = ? WHERE id = ?',
+            [`${codigo}|${expiracion.toISOString()}`, new Date(), user_id]
+        );
+
+        await enviarCorreoVerificacion(user.email, user.nombre_completo, codigo);
+
+        return res.json({
+            success: true,
+            message: 'Código enviado al correo',
+            expires_in: 180,
+        });
+
+    } catch (error) {
+        console.error('Error enviando código:', error);
+        return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    }
+}
+
+async function verificarCodigo(req: Request, res: Response): Promise<Response> {
+    const { user_id, code } = req.body;
+
+    if (!user_id || !code) {
+        return res.status(400).json({ success: false, message: 'user_id y code son obligatorios' });
+    }
+
+    try {
+        const result = await db.query('SELECT * FROM usuarios WHERE id = ?', [user_id]);
+        const user: User | undefined =
+            Array.isArray(result) && result.length > 0 ? result[0] as User : undefined;
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: 'Usuario no encontrado' });
+        }
+
+        if (user.verificado) {
+            return res.status(400).json({ success: false, message: 'La cuenta ya está verificada' });
+        }
+
+        const guardado = user.token_verificacion; // formato: "123456|2026-06-28T..."
+        if (!guardado) {
+            return res.status(400).json({ success: false, message: 'No hay un código pendiente. Solicita uno nuevo.' });
+        }
+
+        const [codigoGuardado, fechaExpiracion] = guardado.split('|');
+
+        if (new Date() > new Date(fechaExpiracion)) {
+            return res.status(410).json({ success: false, message: 'El código expiró. Solicita uno nuevo.' });
+        }
+
+        if (code !== codigoGuardado) {
+            return res.status(400).json({ success: false, message: 'Código incorrecto' });
+        }
+
+        await db.query(
+            'UPDATE usuarios SET verificado = 1, estado = 1, token_verificacion = NULL WHERE id = ?',
+            [user_id]
+        );
+
+        return res.json({
+            success: true,
+            message: 'Cuenta verificada correctamente',
+            user: {
+                id: user_id,
+                user_name: user.user_name,
+                email: user.email,
+            },
+        });
+
+    } catch (error) {
+        console.error('Error verificando código:', error);
+        return res.status(500).json({ success: false, message: 'Error interno del servidor' });
+    }
+}
+
 export default {
     login,
     register,
-    changePassword
+    changePassword,
+    enviarCodigoVerificacion,
+    verificarCodigo,
 };

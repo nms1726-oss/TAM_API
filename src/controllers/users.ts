@@ -97,6 +97,21 @@ async function updateUser(req: Request, res: Response): Promise<Response> {
             valores.push(data.nombre_completo);
         }
 
+        if (data.tipo_documento !== undefined) {
+            campos.push("tipo_documento = ?");
+            valores.push(data.tipo_documento);
+        }
+
+        if (data.identificacion !== undefined) {
+            campos.push("identificacion = ?");
+            valores.push(data.identificacion);
+        }
+
+        if (data.fecha_nacimiento !== undefined) {
+            campos.push("fecha_nacimiento = ?");
+            valores.push(data.fecha_nacimiento);
+        }
+
         if (data.email !== undefined) {
             campos.push("email = ?");
             valores.push(data.email);
@@ -112,6 +127,12 @@ async function updateUser(req: Request, res: Response): Promise<Response> {
             valores.push(data.user_name);
         }
 
+        // ESTE FALTABA
+        if (data.rol_id !== undefined) {
+            campos.push("rol_id = ?");
+            valores.push(data.rol_id);
+        }
+
         if (data.estado !== undefined) {
             campos.push("estado = ?");
             valores.push(data.estado);
@@ -123,7 +144,9 @@ async function updateUser(req: Request, res: Response): Promise<Response> {
         }
 
         if (campos.length === 0) {
-            return res.status(400).json({ error: "No hay campos para actualizar" });
+            return res.status(400).json({
+                error: "No hay campos para actualizar"
+            });
         }
 
         valores.push(id);
@@ -136,7 +159,6 @@ async function updateUser(req: Request, res: Response): Promise<Response> {
 
         await db.query(query, valores);
 
-        // Actualizar teléfono
         if (data.telefono !== undefined) {
             await db.query(
                 `UPDATE telefono_usuarios
@@ -155,7 +177,9 @@ async function updateUser(req: Request, res: Response): Promise<Response> {
 
     } catch (error) {
         console.error('Error actualizando el usuario:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        return res.status(500).json({
+            error: 'Error interno del servidor'
+        });
     }
 }
 

@@ -54,20 +54,23 @@ async function createphoneUser(req: Request, res: Response): Promise<Response | 
 }
 
 async function updatephoneUser(req: Request, res: Response): Promise<Response> {
-    const id = parseInt(req.params.id as string);
     const data = req.body as phoneUser;
 
     try {
+        const usuario_id = parseInt(req.params.id as string);
+        const { telefono } = req.body;
+
         const result = await db.query(
-            'UPDATE telefono_usuarios SET usuario_id = ?, telefono = ? WHERE usuario_id = ?',
-            [data.usuario_id, data.telefono, id]
+            'UPDATE telefono_usuarios SET telefono = ? WHERE usuario_id = ?',
+            [telefono, usuario_id]
         );
 
         if (!result) {
             return res.status(404).json({ error: 'Usuario de teléfono no encontrado' });
         }
 
-        return res.json({ id, ...data });
+        //CORREGIDO: usar usuario_id en lugar de id
+        return res.json({ id: usuario_id, usuario_id, telefono });
     } catch (error) {
         console.error('Error actualizando usuario de teléfono:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });

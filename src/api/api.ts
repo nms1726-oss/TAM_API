@@ -64,6 +64,9 @@ export class ExpressApi implements API {
     expressApp.use(express.urlencoded({ extended: true }));
     expressApp.use('/', this.router);
 
+    const path = require('path');
+    expressApp.use('/uploads', express.static(path.join(__dirname, '../../uploads')));
+
     return http.createServer(expressApp);
   }
 }

@@ -22,18 +22,7 @@ const storage = multer.diskStorage({
     },
 
     filename: (_req, file, cb) => {
-
-        const nombre = file.originalname;
-
-        // Ruta completa del archivo
-        const rutaArchivo = path.join(uploadDir, nombre);
-
-        // Verificar si ya existe
-        if (fs.existsSync(rutaArchivo)) {
-            return cb(new Error('Ya existe una imagen con ese nombre.'), nombre);
-        }
-
-        cb(null, nombre);
+        cb(null, file.originalname);
     }
 });
 
